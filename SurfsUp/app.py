@@ -38,8 +38,8 @@ def home():
                 <li>/api/v1.0/precipitation</li>
                 <li>/api/v1.0/stations</li>
                 <li>/api/v1.0/tobs</li>
-                <li>/api/v1.0/start</li> 
-                <li>/api/v1.0/[start]/[end]</li> 
+                <li>/api/v1.0/<start></li> 
+                <li>/api/v1.0/<start>/<end></li> 
             </ul>
                 '''
 
@@ -69,7 +69,6 @@ def tobs():
     lastdate = session.query(func.max(M.date)).first()[0]
     lastdate = dt.datetime.strptime(lastdate, '%Y-%m-%d').date()
     preyear = lastdate - dt.timedelta(days=365)
-    #preyear = dt.datetime.strptime(lastdate, '%Y-%m-%d').date() - dt.timedelta(days = 365) 
    
     temperature_data = session.query(M.date, M.tobs) \
                               .filter(M.station == most_active_station) \
@@ -79,49 +78,27 @@ def tobs():
     
     return jsonify(temperature_list)
 
-@app.route('/api/v1.0/start')
-def temp_start():
-    session = Session(bind=engine)
-    start_date = dt.datetime.strptime('2016-08-23', '%Y-%m-%d').date()
-    results = session.query(func.min(M.tobs), func.max(M.tobs), func.avg(M.tobs)) \
-                 .join(S, M.station == S.station) \
-                 .filter(M.date >= '2016-08-23') \
+@app.route('/api/v1.0/<start>')
+def temp_start(start):
+    with Session(engine) as session:
+        results = session.query(func.min(M.tobs), func.max(M.tobs), func.avg(M.tobs)) \
+                 .filter(M.date >= start) \
                  .all()
 
-    tmin, tavg, tmax = results[0]
-    
-    response = {
-        "TMIN": tmin,
-        "TAVG": tavg,
-        "TMAX": tmax
-    }
-    
-    return jsonify(response)
+    start_list = [{'TMIN': results[0][0], 'TAVG': results[0][1], 'TMAX': results[0][2]}]
+    return jsonify(start_list)
     
 
-@app.route('/api/v1.0/[start]/[end]')
-def temp_range():
-    session = Session(bind=engine)
+@app.route("/api/v1.0/<start>/<end>")
+def temp_range(start, end):
     
-    start_date = dt.datetime.strptime('2010-01-01', '%Y-%m-%d')
-    end_date = dt.datetime.strptime('2016-08-23', '%Y-%m-%d')
+    with Session(engine) as session:
+       
+        results = session.query(func.min(M.tobs), func.avg(M.tobs), func.max(M.tobs)).\
+            filter(M.date >= start, M.date <= end).all()
     
-    result = session.query(func.min(M.tobs), func.avg(M.tobs), func.max(M.tobs)) \
-                    .join(S, M.station == S.station) \
-                    .filter(M.date >= start_date) \
-                    .filter(M.date <= end_date) \
-                    .all()
-    
-    tmin, tavg, tmax = result[0]
-    
-
-    response = {
-        "TMIN": tmin,
-        "TAVG": tavg,
-        "TMAX": tmax
-    }
-    
-    return jsonify(response)
+    date_list = [{'TMIN': results[0][0], 'TAVG': results[0][1], 'TMAX': results[0][2]}]
+    return jsonify(date_list)
 
 
 if __name__ == '__main__':
