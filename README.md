@@ -3,8 +3,8 @@
 This project provides a detailed climate analysis and data exploration of a climate database using Python, SQLAlchemy, Pandas, and Matplotlib. Additionally, it implements a Flask API based on the developed queries to provide access to the analyzed data.
 
 ## Overview
-In this project, we analyza and explore climate data stored in a SQLite database. THe analysis involves performing queries to ectract relevant information about precipitation and station data. Additionally, we visualize the data using Matplolib to gain insights into the climate patterns.
-A Flask API is designes to provide access to the analyzed data. The API offers various routes to retrieve precipitation, station and temperature oberservation data in JSON format.
+In this project, we analyza and explore climate data stored in a SQLite database. THe analysis involves performing queries to extract relevant information about precipitation and station data. Additionally, we visualize the data using Matplolib to gain insights into the climate patterns.
+A Flask API is designed to provide access to the analyzed data. The API offers various routes to retrieve precipitation, station and temperature oberservation data in JSON format.
 
 ## Getting Started
 To run the project locally, follow these steps:
